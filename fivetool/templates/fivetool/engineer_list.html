@@ -1,0 +1,150 @@
+{% extends 'fivetool/base.html' %}
+
+{% block title %}Engineers - Ortbo{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Engineers</h1>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <form method="get" class="d-flex">
+            <input type="text" name="search" class="form-control me-2" placeholder="Search engineers..." {% if search %}value="{{ search }}"{% endif %}>
+            <button type="submit" class="btn btn-outline-primary">Search</button>
+        </form>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{% url 'team-organizer' %}" class="btn btn-success">Organize Teams</a>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for engineer in engineers %}
+    <div class="col">
+        <div class="card h-100 engineer-card" data-id="{{ engineer.id }}">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    {% if engineer.profile_image %}
+                    <img src="{{ engineer.profile_image }}" alt="{{ engineer.firstname }} {{ engineer.lastname }}" class="rounded-circle me-3" width="50" height="50">
+                    {% else %}
+                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                        {{ engineer.firstname|first }}{{ engineer.lastname|first }}
+                    </div>
+                    {% endif %}
+                    <div>
+                        <h5 class="card-title mb-0">{{ engineer.firstname }} {{ engineer.lastname }}</h5>
+                        <p class="card-text text-muted">{{ engineer.get_current_title_display }}</p>
+                    </div>
+                </div>
+                
+                <div class="skill-radar">
+                    <canvas id="radar-{{ engineer.id }}"></canvas>
+                </div>
+                
+                <div class="mt-3">
+                    {% if engineer.team %}
+                    <span class="badge bg-info">{{ engineer.team.name }}</span>
+                    {% else %}
+                    <span class="badge bg-secondary">Unassigned</span>
+                    {% endif %}
+                    <span class="badge bg-primary">{{ engineer.get_current_title_display }}</span>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent">
+                <a href="{% url 'engineer-detail' engineer.id %}" class="btn btn-sm btn-outline-primary">View Profile</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">No engineers found.</div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if is_paginated %}
+<nav aria-label="Page navigation" class="my-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page=1">&laquo; First</a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active">
+                <span class="page-link">{{ num }}</span>
+            </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% for engineer in engineers %}
+        new Chart(document.getElementById('radar-{{ engineer.id }}').getContext('2d'), {
+            type: 'radar',
+            data: {
+                labels: ['Algorithms', 'Data Structures', 'System Design', 'Testing', 'Debugging', 'Version Control', 'Communication', 'Teamwork', 'Problem Solving'],
+                datasets: [{
+                    label: 'Skills',
+                    data: [
+                        {{ engineer.algorithms }},
+                        {{ engineer.data_structures }},
+                        {{ engineer.system_design }},
+                        {{ engineer.testing }},
+                        {{ engineer.debugging }},
+                        {{ engineer.version_control }},
+                        {{ engineer.communication }},
+                        {{ engineer.teamwork }},
+                        {{ engineer.problem_solving }}
+                    ],
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(54, 162, 235, 1)'
+                }]
+            },
+            options: {
+                scales: {
+                    r: {
+                        min: 0,
+                        max: 5,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+        {% endfor %}
+    });
+</script>
+{% endblock %}

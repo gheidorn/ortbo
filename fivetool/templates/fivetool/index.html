@@ -1,0 +1,46 @@
+{% extends 'fivetool/base.html' %}
+
+{% block title %}Ortbo - Home{% endblock %}
+
+{% block content %}
+<div class="jumbotron bg-light p-5 rounded">
+    <h1 class="display-4">Welcome to Ortbo</h1>
+    <p class="lead">Engineering team management and skill visualization system</p>
+    <hr class="my-4">
+    <p>Organize your engineers, visualize skills, and build balanced teams.</p>
+    <div class="mt-4">
+        <a href="{% url 'engineer-list' %}" class="btn btn-primary me-2">View Engineers</a>
+        <a href="{% url 'team-organizer' %}" class="btn btn-success">Team Organizer</a>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Engineers</h5>
+                <p class="card-text">View and manage engineer skill profiles with detailed visualizations.</p>
+                <a href="{% url 'engineer-list' %}" class="btn btn-sm btn-outline-primary">View Engineers</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Teams</h5>
+                <p class="card-text">Manage engineering teams and view team composition and skill distribution.</p>
+                <a href="{% url 'team-list' %}" class="btn btn-sm btn-outline-primary">View Teams</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">Team Organizer</h5>
+                <p class="card-text">Drag and drop interface to organize engineers into balanced teams.</p>
+                <a href="{% url 'team-organizer' %}" class="btn btn-sm btn-outline-primary">Organize Teams</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

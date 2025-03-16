@@ -1,0 +1,1 @@
+web: gunicorn ortbo.wsgi --log-file -

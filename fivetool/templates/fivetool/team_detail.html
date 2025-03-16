@@ -1,0 +1,407 @@
+{% extends 'fivetool/base.html' %}
+
+{% block title %}{{ team.name }} - Ortbo{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{% url 'team-list' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Teams
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">{{ team.name }}</h3>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-link text-white p-0" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item edit-team" href="#" data-team-id="{{ team.id }}" data-team-name="{{ team.name }}" data-team-description="{{ team.description }}">Edit Team</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger delete-team" href="#" data-team-id="{{ team.id }}">Delete Team</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card-body">
+                <p class="lead">{{ team.description|default:"No description provided." }}</p>
+                
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4>Team Members ({{ team.members.count }})</h4>
+                    <a href="{% url 'team-organizer' %}" class="btn btn-success">
+                        <i class="bi bi-people"></i> Organize Team
+                    </a>
+                </div>
+                
+                {% if team.members.count > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Title</th>
+                                <th>Core Skills</th>
+                                <th>Engineering</th>
+                                <th>Soft Skills</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for engineer in team.members.all %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {% if engineer.profile_image %}
+                                        <img src="{{ engineer.profile_image }}" alt="{{ engineer.firstname }} {{ engineer.lastname }}" class="rounded-circle me-2" width="40" height="40">
+                                        {% else %}
+                                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                            {{ engineer.firstname|first }}{{ engineer.lastname|first }}
+                                        </div>
+                                        {% endif %}
+                                        <div>
+                                            <h6 class="mb-0">{{ engineer.firstname }} {{ engineer.lastname }}</h6>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ engineer.get_current_title_display }}</td>
+                                <td>
+                                    <div class="d-flex">
+                                        <div class="me-2" data-bs-toggle="tooltip" title="Algorithms: {{ engineer.get_algorithms_display }}">
+                                            <div class="progress" style="width: 30px; height: 30px;">
+                                                <div class="progress-bar bg-primary rounded-circle d-flex align-items-center justify-content-center" role="progressbar" style="width: 100%" aria-valuenow="{{ engineer.algorithms }}" aria-valuemin="0" aria-valuemax="5">
+                                                    {{ engineer.algorithms }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="me-2" data-bs-toggle="tooltip" title="Data Structures: {{ engineer.get_data_structures_display }}">
+                                            <div class="progress" style="width: 30px; height: 30px;">
+                                                <div class="progress-bar bg-primary rounded-circle d-flex align-items-center justify-content-center" role="progressbar" style="width: 100%" aria-valuenow="{{ engineer.data_structures }}" aria-valuemin="0" aria-valuemax="5">
+                                                    {{ engineer.data_structures }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div data-bs-toggle="tooltip" title="System Design: {{ engineer.get_system_design_display }}">
+                                            <div class="progress" style="width: 30px; height: 30px;">
+                                                <div class="progress-bar bg-primary rounded-circle d-flex align-items-center justify-content-center" role="progressbar" style="width: 100%" aria-valuenow="{{ engineer.system_design }}" aria-valuemin="0" aria-valuemax="5">
+                                                    {{ engineer.system_design }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex">
+                                        <div class="me-2" data-bs-toggle="tooltip" title="Testing: {{ engineer.get_testing_display }}">
+                                            <div class="progress" style="width: 30px; height: 30px;">
+                                                <div class="progress-bar bg-success rounded-circle d-flex align-items-center justify-content-center" role="progressbar" style="width: 100%" aria-valuenow="{{ engineer.testing }}" aria-valuemin="0" aria-valuemax="5">
+                                                    {{ engineer.testing }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="me-2" data-bs-toggle="tooltip" title="Debugging: {{ engineer.get_debugging_display }}">
+                                            <div class="progress" style="width: 30px; height: 30px;">
+                                                <div class="progress-bar bg-success rounded-circle d-flex align-items-center justify-content-center" role="progressbar" style="width: 100%" aria-valuenow="{{ engineer.debugging }}" aria-valuemin="0" aria-valuemax="5">
+                                                    {{ engineer.debugging }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div data-bs-toggle="tooltip" title="Version Control: {{ engineer.get_version_control_display }}">
+                                            <div class="progress" style="width: 30px; height: 30px;">
+                                                <div class="progress-bar bg-success rounded-circle d-flex align-items-center justify-content-center" role="progressbar" style="width: 100%" aria-valuenow="{{ engineer.version_control }}" aria-valuemin="0" aria-valuemax="5">
+                                                    {{ engineer.version_control }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex">
+                                        <div class="me-2" data-bs-toggle="tooltip" title="Communication: {{ engineer.get_communication_display }}">
+                                            <div class="progress" style="width: 30px; height: 30px;">
+                                                <div class="progress-bar bg-info rounded-circle d-flex align-items-center justify-content-center" role="progressbar" style="width: 100%" aria-valuenow="{{ engineer.communication }}" aria-valuemin="0" aria-valuemax="5">
+                                                    {{ engineer.communication }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="me-2" data-bs-toggle="tooltip" title="Teamwork: {{ engineer.get_teamwork_display }}">
+                                            <div class="progress" style="width: 30px; height: 30px;">
+                                                <div class="progress-bar bg-info rounded-circle d-flex align-items-center justify-content-center" role="progressbar" style="width: 100%" aria-valuenow="{{ engineer.teamwork }}" aria-valuemin="0" aria-valuemax="5">
+                                                    {{ engineer.teamwork }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div data-bs-toggle="tooltip" title="Problem Solving: {{ engineer.get_problem_solving_display }}">
+                                            <div class="progress" style="width: 30px; height: 30px;">
+                                                <div class="progress-bar bg-info rounded-circle d-flex align-items-center justify-content-center" role="progressbar" style="width: 100%" aria-valuenow="{{ engineer.problem_solving }}" aria-valuemin="0" aria-valuemax="5">
+                                                    {{ engineer.problem_solving }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="{% url 'engineer-detail' engineer.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <p class="mb-0">This team doesn't have any members yet. Use the Team Organizer to assign engineers to this team.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">Team Skills</h4>
+            </div>
+            <div class="card-body">
+                {% if team.members.exists %}
+                <canvas id="team-skills-radar"></canvas>
+                
+                <hr class="my-4">
+                
+                <h5 class="mb-3">Average Skill Levels</h5>
+                
+                <h6 class="mt-3">Core Programming</h6>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Algorithms</span>
+                        <span>{{ avg_algorithms|floatformat:1 }}/5</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ avg_algorithms|floatformat:0 }}0%" aria-valuenow="{{ avg_algorithms }}" aria-valuemin="0" aria-valuemax="5"></div>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Data Structures</span>
+                        <span>{{ avg_data_structures|floatformat:1 }}/5</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ avg_data_structures|floatformat:0 }}0%" aria-valuenow="{{ avg_data_structures }}" aria-valuemin="0" aria-valuemax="5"></div>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>System Design</span>
+                        <span>{{ avg_system_design|floatformat:1 }}/5</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ avg_system_design|floatformat:0 }}0%" aria-valuenow="{{ avg_system_design }}" aria-valuemin="0" aria-valuemax="5"></div>
+                    </div>
+                </div>
+                
+                <h6 class="mt-3">Engineering Practices</h6>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Testing</span>
+                        <span>{{ avg_testing|floatformat:1 }}/5</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ avg_testing|floatformat:0 }}0%" aria-valuenow="{{ avg_testing }}" aria-valuemin="0" aria-valuemax="5"></div>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Debugging</span>
+                        <span>{{ avg_debugging|floatformat:1 }}/5</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ avg_debugging|floatformat:0 }}0%" aria-valuenow="{{ avg_debugging }}" aria-valuemin="0" aria-valuemax="5"></div>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Version Control</span>
+                        <span>{{ avg_version_control|floatformat:1 }}/5</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ avg_version_control|floatformat:0 }}0%" aria-valuenow="{{ avg_version_control }}" aria-valuemin="0" aria-valuemax="5"></div>
+                    </div>
+                </div>
+                
+                <h6 class="mt-3">Soft Skills</h6>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Communication</span>
+                        <span>{{ avg_communication|floatformat:1 }}/5</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-info" role="progressbar" style="width: {{ avg_communication|floatformat:0 }}0%" aria-valuenow="{{ avg_communication }}" aria-valuemin="0" aria-valuemax="5"></div>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Teamwork</span>
+                        <span>{{ avg_teamwork|floatformat:1 }}/5</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-info" role="progressbar" style="width: {{ avg_teamwork|floatformat:0 }}0%" aria-valuenow="{{ avg_teamwork }}" aria-valuemin="0" aria-valuemax="5"></div>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>Problem Solving</span>
+                        <span>{{ avg_problem_solving|floatformat:1 }}/5</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-info" role="progressbar" style="width: {{ avg_problem_solving|floatformat:0 }}0%" aria-valuenow="{{ avg_problem_solving }}" aria-valuemin="0" aria-valuemax="5"></div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <p class="mb-0">Team skills will be displayed once members are added to the team.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Team Info</h4>
+            </div>
+            <div class="card-body">
+                <p><strong>Created:</strong> {{ team.created_at|date:"F j, Y" }}</p>
+                <p><strong>Last Updated:</strong> {{ team.updated_at|date:"F j, Y" }}</p>
+                
+                <div class="d-grid gap-2 mt-3">
+                    <button class="btn btn-outline-primary edit-team" data-team-id="{{ team.id }}" data-team-name="{{ team.name }}" data-team-description="{{ team.description }}">
+                        <i class="bi bi-pencil"></i> Edit Team
+                    </button>
+                    <button class="btn btn-outline-danger delete-team" data-team-id="{{ team.id }}">
+                        <i class="bi bi-trash"></i> Delete Team
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Team Modal -->
+<div class="modal fade" id="editTeamModal" tabindex="-1" aria-labelledby="editTeamModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editTeamModalLabel">Edit Team</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editTeamForm" method="post" action="{% url 'team-update' team.id %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="editTeamName" class="form-label">Team Name</label>
+                        <input type="text" class="form-control" id="editTeamName" name="name" value="{{ team.name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTeamDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="editTeamDescription" name="description" rows="3">{{ team.description }}</textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="editTeamForm" class="btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Team Confirmation Modal -->
+<div class="modal fade" id="deleteTeamModal" tabindex="-1" aria-labelledby="deleteTeamModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteTeamModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the team "{{ team.name }}"?</p>
+                <p>All engineers will be moved to the unassigned group.</p>
+                <form id="deleteTeamForm" method="post" action="{% url 'team-delete' team.id %}">
+                    {% csrf_token %}
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="deleteTeamForm" class="btn btn-danger">Delete Team</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        // Edit team modal
+        document.querySelectorAll('.edit-team').forEach(button => {
+            button.addEventListener('click', function() {
+                new bootstrap.Modal(document.getElementById('editTeamModal')).show();
+            });
+        });
+        
+        // Delete team modal
+        document.querySelectorAll('.delete-team').forEach(button => {
+            button.addEventListener('click', function() {
+                new bootstrap.Modal(document.getElementById('deleteTeamModal')).show();
+            });
+        });
+        
+        {% if team.members.exists %}
+        // Team skills radar chart
+        new Chart(document.getElementById('team-skills-radar').getContext('2d'), {
+            type: 'radar',
+            data: {
+                labels: ['Algorithms', 'Data Structures', 'System Design', 'Testing', 'Debugging', 'Version Control', 'Communication', 'Teamwork', 'Problem Solving'],
+                datasets: [{
+                    label: 'Average Team Skills',
+                    data: [
+                        {{ avg_algorithms }},
+                        {{ avg_data_structures }},
+                        {{ avg_system_design }},
+                        {{ avg_testing }},
+                        {{ avg_debugging }},
+                        {{ avg_version_control }},
+                        {{ avg_communication }},
+                        {{ avg_teamwork }},
+                        {{ avg_problem_solving }}
+                    ],
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(75, 192, 192, 1)'
+                }]
+            },
+            options: {
+                scales: {
+                    r: {
+                        min: 0,
+                        max: 5,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+        {% endif %}
+    });
+</script>
+{% endblock %}
