@@ -13,14 +13,16 @@ Ortbo is a Django web application for visualizing engineer skills and organizing
 
 - **Backend**: Django 5.0+
 - **Frontend**: Bootstrap 5, Chart.js
-- **Database**: PostgreSQL (production) / SQLite (development)
-- **Deployment**: Heroku-ready
+- **Database**: PostgreSQL
+- **Web Server**: Nginx
+- **Deployment**: Docker, Docker Compose
+- **Host**: Digital Ocean Droplet
 
 ## Development Setup
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/ortbo.git
+   git clone https://github.com/gheidorn/ortbo.git
    cd ortbo
    ```
 
@@ -53,48 +55,114 @@ Ortbo is a Django web application for visualizing engineer skills and organizing
 
 7. Access the application at http://localhost:8000/fivetool/
 
-## Deployment to Heroku
+## Docker Setup (Local Development)
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
-
-### Manual Deployment Steps
-
-1. Create a Heroku app:
+1. Clone the repository:
    ```
-   heroku create your-app-name
+   git clone https://github.com/gheidorn/ortbo.git
+   cd ortbo
    ```
 
-2. Add PostgreSQL add-on:
+2. Create a `.env` file based on `.env.example`:
    ```
-   heroku addons:create heroku-postgresql:hobby-dev
-   ```
-
-3. Configure environment variables:
-   ```
-   heroku config:set SECRET_KEY=$(python -c "import secrets; print(secrets.token_urlsafe(50))")
-   heroku config:set DEBUG=False
-   heroku config:set ALLOWED_HOSTS=your-app-name.herokuapp.com
+   cp .env.example .env
    ```
 
-4. Deploy your code:
+3. Edit the `.env` file and update the settings.
+
+4. Build and start the containers:
    ```
-   git push heroku main
+   docker compose up -d --build
    ```
 
-5. Run migrations:
+5. Create a superuser:
    ```
-   heroku run python manage.py migrate
-   ```
-
-6. Load example data:
-   ```
-   heroku run python add_example_data.py
+   docker compose exec web python manage.py createsuperuser
    ```
 
-7. Create a superuser:
+6. Access the application at http://localhost:80
+
+## Deployment to Digital Ocean
+
+### Prerequisites
+
+- Docker and Docker Compose installed on your Digital Ocean Droplet
+- Domain name configured to point to your Droplet's IP address
+- Basic knowledge of Nginx and SSL configuration
+
+### Deployment Steps
+
+1. Clone the repository on your Digital Ocean Droplet:
    ```
-   heroku run python manage.py createsuperuser
+   git clone https://github.com/gheidorn/ortbo.git
+   cd ortbo
    ```
+
+2. Create a `.env` file with your production settings:
+   ```
+   cp .env.example .env
+   ```
+
+3. Edit the `.env` file with appropriate values:
+   ```
+   # Generate a secure random key
+   SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_urlsafe(50))")
+   
+   # Set to False in production
+   DEBUG=False
+   
+   # Update with your domain
+   ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
+   DOMAIN=yourdomain.com
+   
+   # Set secure database credentials
+   POSTGRES_DB=ortbo
+   POSTGRES_USER=your_db_user
+   POSTGRES_PASSWORD=your_secure_password
+   DATABASE_URL=postgres://your_db_user:your_secure_password@db:5432/ortbo
+   ```
+
+4. Configure SSL:
+   ```
+   # Generate self-signed certificates for development
+   # For production, use Let's Encrypt or other certificate authority
+   mkdir -p nginx/ssl
+   openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx/ssl/key.pem -out nginx/ssl/cert.pem
+   ```
+
+5. Build and start the containers:
+   ```
+   docker compose up -d --build
+   ```
+
+6. Monitor the logs to ensure everything is working:
+   ```
+   docker compose logs -f
+   ```
+
+7. Access your application at https://yourdomain.com
+
+### Production Considerations
+
+1. For proper SSL certificates, consider using Let's Encrypt with Certbot:
+   ```
+   # Install Certbot
+   apt-get update
+   apt-get install certbot python3-certbot-nginx
+   
+   # Obtain certificates
+   certbot --nginx -d yourdomain.com -d www.yourdomain.com
+   ```
+
+2. Set up regular database backups:
+   ```
+   # Add to crontab for daily backups
+   0 0 * * * docker compose exec -T db pg_dump -U your_db_user ortbo > /path/to/backups/ortbo_$(date +\%Y\%m\%d).sql
+   ```
+
+3. Configure firewall rules to only allow traffic on necessary ports (22, 80, 443).
+
+4. Set up monitoring and alerting with tools like Datadog or Prometheus.
 
 ## License
 
